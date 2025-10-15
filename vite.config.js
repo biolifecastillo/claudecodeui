@@ -11,10 +11,15 @@ export default defineConfig(({ command, mode }) => {
     server: {
       port: parseInt(env.VITE_PORT) || 3001,
       proxy: {
-        '/api': `http://localhost:${env.PORT || 3002}`,
+        '/api': {
+          target: `http://localhost:${env.PORT || 3002}`,
+          changeOrigin: true,
+          secure: false
+        },
         '/ws': {
           target: `ws://localhost:${env.PORT || 3002}`,
-          ws: true
+          ws: true,
+          changeOrigin: true
         }
       }
     },
