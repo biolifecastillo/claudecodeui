@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Launch Server",
+      "program": "${workspaceFolder}/server/index.js",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "type": "pwa-node",
+      "request": "attach",
+      "name": "Attach to Vite (9229)",
+      "port": 9229,
+      "preLaunchTask": "npm: dev"
+    }
+  ]
+  ,
+  "compounds": [
+    {
+      "name": "Server + Vite",
+      "configurations": ["Launch Server", "Attach to Vite (9229)"]
+    }
+  ]
+}

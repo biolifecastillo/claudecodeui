@@ -2,10 +2,24 @@ import { promises as fs } from 'fs';
 import fsSync from 'fs';
 import path from 'path';
 import readline from 'readline';
+import os from 'os';
 
 // Cache for extracted project directories
 const projectDirectoryCache = new Map();
 let cacheTimestamp = Date.now();
+
+// Get Claude home directory
+const claudeHome = path.join(os.homedir(), '.claude');
+
+// Ensure Claude directory exists
+async function ensureClaudeDirs() {
+  try {
+    await fs.mkdir(claudeHome, { recursive: true });
+    await fs.mkdir(path.join(claudeHome, 'projects'), { recursive: true });
+  } catch (error) {
+    console.warn('Error creating Claude directories:', error.message);
+  }
+}
 
 // Clear cache when needed (called when project files change)
 function clearProjectDirectoryCache() {
@@ -15,8 +29,9 @@ function clearProjectDirectoryCache() {
 
 // Load project configuration file
 async function loadProjectConfig() {
-  const configPath = path.join(process.env.HOME, '.claude', 'project-config.json');
+  const configPath = path.join(claudeHome, 'project-config.json');
   try {
+    await ensureClaudeDirs();
     const configData = await fs.readFile(configPath, 'utf8');
     return JSON.parse(configData);
   } catch (error) {
@@ -27,7 +42,8 @@ async function loadProjectConfig() {
 
 // Save project configuration file
 async function saveProjectConfig(config) {
-  const configPath = path.join(process.env.HOME, '.claude', 'project-config.json');
+  const configPath = path.join(claudeHome, 'project-config.json');
+  await ensureClaudeDirs();
   await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
 }
 

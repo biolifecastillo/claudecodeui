@@ -32,7 +32,20 @@ import cors from 'cors';
 import { promises as fsPromises } from 'fs';
 import { spawn } from 'child_process';
 import os from 'os';
-import pty from 'node-pty';
+// Lazy loader for node-pty to avoid startup crashes when native modules are missing
+let _pty = null;
+async function getPty() {
+  if (_pty) return _pty;
+  try {
+    const mod = await import('node-pty').catch(() => null);
+    _pty = mod ? mod.default || mod : null;
+    if (!_pty) console.warn('node-pty not available; terminal features will be disabled');
+    return _pty;
+  } catch (e) {
+    console.warn('Failed to load node-pty:', e && e.message ? e.message : e);
+    return null;
+  }
+}
 import fetch from 'node-fetch';
 import mime from 'mime-types';
 
@@ -51,7 +64,7 @@ const connectedClients = new Set();
 // Setup file system watcher for Claude projects folder using chokidar
 async function setupProjectsWatcher() {
   const chokidar = (await import('chokidar')).default;
-  const claudeProjectsPath = path.join(process.env.HOME, '.claude', 'projects');
+  const claudeProjectsPath = path.join(os.homedir(), '.claude', 'projects');
   
   if (projectsWatcher) {
     projectsWatcher.close();
@@ -529,7 +542,9 @@ function handleShellConnection(ws) {
           console.log('🔧 Executing shell command:', shellCommand);
           
           // Start shell using PTY for proper terminal emulation
-          shellProcess = pty.spawn('bash', ['-c', shellCommand], {
+          const ptyModule = await getPty();
+          if (!ptyModule) throw new Error('node-pty not available');
+          shellProcess = ptyModule.spawn('bash', ['-c', shellCommand], {
             name: 'xterm-256color',
             cols: 80,
             rows: 24,
