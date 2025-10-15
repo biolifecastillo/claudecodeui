@@ -1,0 +1,31 @@
+openapi: 3.0.3
+info:
+  title: Claude Code UI API
+  description: Minimal OpenAPI spec for Claude Code UI (used by docs/readme)
+  version: '1.0.0'
+servers:
+  - url: http://localhost:3000
+  securitySchemes:
+    ClaudCodeUI:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        API key for accessing Claude Code UI endpoints. Provide the key in the `X-API-Key` header.
+
+        Server-side validation: the backend middleware looks for the header `X-API-Key` and compares
+        it to the `API_KEY` environment variable (see `server/middleware/auth.js`).
+      x-readme-authentication-type: apiKey
+      x-readme-authentication-in: header
+      x-readme-authentication-name: X-API-Key
+security:
+  - ClaudCodeUI: []
+paths:
+  /api/projects:
+    get:
+      summary: List projects
+      security:
+        - ClaudCodeUI: []
+      responses:
+        '200':
+          description: OK

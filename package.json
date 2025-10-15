@@ -21,6 +21,9 @@
   ],
   "author": "Claude Code UI Contributors",
   "license": "MIT",
+  "optionalDependencies": {
+    "better-sqlite3": "^12.2.0"
+  },
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",
     "@codemirror/lang-html": "^6.4.9",
@@ -34,7 +37,6 @@
     "@xterm/addon-clipboard": "^0.1.0",
     "@xterm/addon-webgl": "^0.18.0",
     "bcrypt": "^6.0.0",
-    "better-sqlite3": "^12.2.0",
     "chokidar": "^4.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
